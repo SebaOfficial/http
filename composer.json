@@ -1,0 +1,37 @@
+{
+    "name": "seba/http",
+    "description": "HTTP interface for Seba's projects",
+    "type": "library",
+    "keywords": [
+        "library",
+        "http"
+    ],
+    "homepage": "https://github.com/SebaOfficial/HTTP",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Seba\\HTTP\\": "src/",
+            "Seba\\HTTP\\Exceptions\\": "src/Exceptions/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Sebastiano",
+            "email": "sebastiano@racca.me",
+            "role": "Developer",
+            "homepage": "https://github.com/SebaOfficial"
+        }
+    ],
+    "require-dev": {
+        "pestphp/pest": "^1.0",
+        "pestphp/pest-plugin-faker": "^1.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "test": "@php vendor/bin/pest --fail-on-warning"
+    }
+}
