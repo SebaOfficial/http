@@ -197,7 +197,7 @@ final class IncomingRequestHandler
     public function allowHeaders(?array $headers): array
     {
         header("Access-Control-Allow-Headers: " . implode(", ", $headers));
-        return array_diff($this->getHeaders(), $allowedHeaders);
+        return array_diff($this->getHeaders(), $headers);
     }
 
     /**
