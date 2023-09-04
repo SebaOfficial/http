@@ -20,12 +20,14 @@ final class IncomingRequestHandler
     private ?array $body;
     private ?string $method;
     private ?array $headers;
+    private ?string $defaultContentType;
 
-    public function __construct()
+    public function __construct(string $defaultContentType = null)
     {
         $this->body = null;
         $this->method = $_SERVER['REQUEST_METHOD'] ?? null;
         $this->headers = $this->getAllHeaders();
+        $this->defaultContentType = $defaultContentType;
     }
 
     /**
@@ -38,7 +40,7 @@ final class IncomingRequestHandler
      */
     private function parseBody(): void
     {
-        switch ($_SERVER['CONTENT_TYPE'] ?? "application/x-www-form-urlencoded"){
+        switch (empty($_SERVER['CONTENT_TYPE']) ? ($this->defaultContentType ?? "") : $_SERVER['CONTENT_TYPE']){
             case "application/x-www-form-urlencoded":
             case "multipart/form-data":
                 if($_SERVER["REQUEST_METHOD"] === "POST")
