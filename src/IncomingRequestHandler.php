@@ -180,7 +180,7 @@ final class IncomingRequestHandler
     {
         $missingParams = $this->getMissingParams($params);
 
-        if (count($this->getBody()) < $minimumKeys || !empty($missingParams)) {
+        if (count($this->getBody()) < $minimumKeys) {
             return false;
         }
 
