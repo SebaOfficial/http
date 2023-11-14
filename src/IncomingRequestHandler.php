@@ -87,7 +87,7 @@ final class IncomingRequestHandler
      *
      * @return string|null The HTTP method or null if not available.
      */
-    public function getMethod(): string|null
+    public function getMethod(): ?string
     {
         return $this->method;
     }
@@ -238,5 +238,45 @@ final class IncomingRequestHandler
 
         header("Access-Control-Allow-Origin: " . ($_SERVER['HTTP_ORIGIN'] ?? "*"));
         return true;
+    }
+
+    /**
+     * Gets the IP address of the client making the request.
+     *
+     * @return string|null The client's IP address or null if not available.
+     */
+    public function getIp(): ?string
+    {
+        return $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? null;
+    }
+
+    /**
+     * Gets the user agent string from the request headers.
+     *
+     * @return string|null The user agent string or null if not available.
+     */
+    public function getUserAgent(): ?string
+    {
+        return $_SERVER['HTTP_USER_AGENT'] ?? null;
+    }
+
+    /**
+     * Gets the protocol used by the request (HTTP/1.1, HTTP/2, etc.).
+     *
+     * @return string|null The protocol or null if not available.
+     */
+    public function getProtocol(): ?string
+    {
+        return $_SERVER['SERVER_PROTOCOL'] ?? null;
+    }
+
+    /**
+     * Checks if the request is secure (HTTPS).
+     *
+     * @return bool True if the request is secure, false otherwise.
+     */
+    public function isSecure(): bool
+    {
+        return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
     }
 }
