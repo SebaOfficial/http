@@ -241,6 +241,28 @@ final class IncomingRequestHandler
     }
 
     /**
+     * Checks if the request has uploaded files.
+     *
+     * @return bool True if there are uploaded files, false otherwise.
+     */
+    public function hasFiles(): bool
+    {
+        return !empty($_FILES);
+    }
+
+    /**
+     * Gets information about an uploaded file.
+     *
+     * @param string $name The name attribute of the file input field.
+     *
+     * @return array|null Information about the uploaded file or null if not found.
+     */
+    public function getFile(string $name): ?array
+    {
+        return $_FILES[$name] ?? null;
+    }
+
+    /**
      * Gets the IP address of the client making the request.
      *
      * @return string|null The client's IP address or null if not available.
