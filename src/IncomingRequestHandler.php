@@ -49,12 +49,7 @@ final class IncomingRequestHandler
             $this->body = ($_SERVER["REQUEST_METHOD"] === "POST") ? $_POST : $_GET;
         } elseif (str_starts_with($contentType, "multipart/form-data")) {
             // Parse data for multipart form submissions.
-            if ($_SERVER["REQUEST_METHOD"] === "POST") {
-                $this->body = $_POST;
-            } else {
-                // Parse raw input for non-POST requests.
-                parse_str(file_get_contents("php://input"), $this->body);
-            }
+            $this->body = $_POST; // Initialize with POST data
 
             // Add support for boundaries in multipart/form-data.
             if (preg_match('/boundary=(.*)$/', $contentType, $matches)) {
@@ -106,7 +101,8 @@ final class IncomingRequestHandler
             }
         }
 
-        $this->body = $formData;
+        // Merge the parsed form data with the existing body.
+        $this->body = array_merge($this->body, $formData);
     }
 
     /**
