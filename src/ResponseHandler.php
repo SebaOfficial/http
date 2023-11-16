@@ -16,7 +16,7 @@ namespace Seba\HTTP;
 final class ResponseHandler
 {
     private int $httpCode;
-    private array|object|null $body;
+    private array|object|string|null $body;
 
     /**
      * Response constructor.
@@ -44,11 +44,11 @@ final class ResponseHandler
     /**
      * Sets the body.
      *
-     * @param int $body   The body to be set.
+     * @param array|object|string $body   The body to be set.
      *
      * @return self       Returns the current instance.
      */
-    public function setBody(array|object $body): self
+    public function setBody(array|object|string $body): self
     {
         $this->body = $body;
         return $this;
@@ -79,7 +79,7 @@ final class ResponseHandler
         http_response_code($this->httpCode);
 
         if(isset($this->body))
-            echo json_encode($this->body);
+            echo is_string($this->body) ? $this->body : json_encode($this->body);
 
         if($exit) exit;
     }
