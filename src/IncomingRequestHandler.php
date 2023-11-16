@@ -31,7 +31,7 @@ final class IncomingRequestHandler
     }
 
     /**
-     * Parses the incoming request body to an associative array.
+     * Parses the incoming request body to an associative array based on the Content-Type header.
      *
      * @return void
      *
@@ -40,31 +40,73 @@ final class IncomingRequestHandler
      */
     private function parseBody(): void
     {
-        switch (empty($_SERVER['CONTENT_TYPE']) ? ($this->defaultContentType ?? "") : $_SERVER['CONTENT_TYPE']){
-            case "application/x-www-form-urlencoded":
-            case "multipart/form-data":
-                if($_SERVER["REQUEST_METHOD"] === "POST")
-                    $this->body = $_POST;
+        // Retrieve the Content-Type header from the request.
+        $contentType = empty($_SERVER['CONTENT_TYPE']) ? ($this->defaultContentType ?? "") : $_SERVER['CONTENT_TYPE'];
 
-                else if($_SERVER["REQUEST_METHOD"] === "GET")
-                    $this->body = $_GET;
+        // Determine the content type and process accordingly.
+        if (str_starts_with($contentType, "application/x-www-form-urlencoded")) {
+            // Parse data for URL-encoded form submissions.
+            $this->body = ($_SERVER["REQUEST_METHOD"] === "POST") ? $_POST : $_GET;
+        } elseif (str_starts_with($contentType, "multipart/form-data")) {
+            // Parse data for multipart form submissions.
+            if ($_SERVER["REQUEST_METHOD"] === "POST") {
+                $this->body = $_POST;
+            } else {
+                // Parse raw input for non-POST requests.
+                parse_str(file_get_contents("php://input"), $this->body);
+            }
 
-                else
-                    parse_str(file_get_contents("php://input"), $this->body);
+            // Add support for boundaries in multipart/form-data.
+            if (preg_match('/boundary=(.*)$/', $contentType, $matches)) {
+                $boundary = $matches[1];
+                $this->parseMultipartFormData($boundary);
+            } else {
+                throw new InvalidContentTypeException("Invalid Content-Type header for multipart/form-data");
+            }
+        } elseif (str_starts_with($contentType, "application/json")) {
+            // Parse data for JSON content.
+            $this->body = json_decode(file_get_contents("php://input"), true);
 
-                break;
-            case "application/json":
-                $this->body = json_decode(file_get_contents("php://input"), true);
-
-                if($this->body === null){
-                    throw new InvalidBodyException("Invalid json in the body.");
-                }
-
-                break;
-            default:
-                throw new InvalidContentTypeException("Invalid Content-Type header");
-                break;
+            // Check for invalid JSON.
+            if ($this->body === null) {
+                throw new InvalidBodyException("Invalid JSON in the body.");
+            }
+        } else {
+            // Invalid Content-Type header.
+            throw new InvalidContentTypeException("Invalid Content-Type header");
         }
+    }
+
+    /**
+     * Parses multipart/form-data and populates the body with form field values.
+     *
+     * @param string $boundary The boundary string for parsing multipart data.
+     *
+     * @return void
+     */
+    private function parseMultipartFormData(string $boundary): void
+    {
+        // Retrieve raw input data.
+        $rawData = file_get_contents("php://input");
+
+        // Initialize an array to store form field values.
+        $formData = [];
+
+        // Parse multipart/form-data.
+        $parts = explode("--$boundary", $rawData);
+
+        foreach ($parts as $part) {
+            if (!empty($part)) {
+                // Extract content-disposition header to identify form field name and value.
+                if (preg_match('/Content-Disposition:.*?name="(.*?)".*?(?:\r\n\r\n|\n\n)(.*)/s', $part, $matches)) {
+                    $name = $matches[1];
+                    $value = $matches[2];
+                    $formData[$name] = $value;
+                }
+            }
+        }
+
+        $this->body = $formData;
     }
 
     /**
