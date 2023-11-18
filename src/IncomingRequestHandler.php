@@ -339,4 +339,24 @@ final class IncomingRequestHandler
     {
         return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
     }
+
+    /**
+     * Gets the uri of the request.
+     *
+     * @return string|null The uri.
+     */
+    public function getUri(): ?string
+    {
+        return $_SERVER['REQUEST_URI'];
+    }
+
+    /**
+     * Parses the uri of the request into an associative array.
+     *
+     * @return array The parsed uri
+     */
+    public function getParsedUri(): array
+    {
+        return parse_url($this->getUri());
+    }
 }
