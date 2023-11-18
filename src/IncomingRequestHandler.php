@@ -1,4 +1,10 @@
 <?php
+declare(strict_types=1);
+
+namespace Seba\HTTP;
+
+use Seba\HTTP\Exceptions\InvalidContentTypeException;
+use Seba\HTTP\Exceptions\InvalidBodyException;
 
 /**
  * Request Class.
@@ -7,14 +13,6 @@
  * @package Seba\HTTP
  * @author Sebastiano Racca
 */
-
-declare(strict_types=1);
-
-namespace Seba\HTTP;
-
-use Seba\HTTP\Exceptions\InvalidContentTypeException;
-use Seba\HTTP\Exceptions\InvalidBodyException;
-
 final class IncomingRequestHandler
 {
     private ?array $body;
@@ -40,18 +38,14 @@ final class IncomingRequestHandler
      */
     private function parseBody(): void
     {
-        // Retrieve the Content-Type header from the request.
         $contentType = empty($_SERVER['CONTENT_TYPE']) ? ($this->defaultContentType ?? "") : $_SERVER['CONTENT_TYPE'];
 
-        // Determine the content type and process accordingly.
         if (str_starts_with($contentType, "application/x-www-form-urlencoded")) {
-            // Parse data for URL-encoded form submissions.
             $this->body = ($_SERVER["REQUEST_METHOD"] === "POST") ? $_POST : $_GET;
+            
         } elseif (str_starts_with($contentType, "multipart/form-data")) {
-            // Parse data for multipart form submissions.
-            $this->body = $_POST; // Initialize with POST data
+            $this->body = $_POST;
 
-            // Add support for boundaries in multipart/form-data.
             if (preg_match('/boundary=(.*)$/', $contentType, $matches)) {
                 $boundary = $matches[1];
                 $this->parseMultipartFormData($boundary);
@@ -59,15 +53,12 @@ final class IncomingRequestHandler
                 throw new InvalidContentTypeException("Invalid Content-Type header for multipart/form-data");
             }
         } elseif (str_starts_with($contentType, "application/json")) {
-            // Parse data for JSON content.
             $this->body = json_decode(file_get_contents("php://input"), true);
 
-            // Check for invalid JSON.
             if ($this->body === null) {
                 throw new InvalidBodyException("Invalid JSON in the body.");
             }
         } else {
-            // Invalid Content-Type header.
             throw new InvalidContentTypeException("Invalid Content-Type header");
         }
     }
@@ -81,18 +72,13 @@ final class IncomingRequestHandler
      */
     private function parseMultipartFormData(string $boundary): void
     {
-        // Retrieve raw input data.
         $rawData = file_get_contents("php://input");
-
-        // Initialize an array to store form field values.
         $formData = [];
-
-        // Parse multipart/form-data.
         $parts = explode("--$boundary", $rawData);
 
         foreach ($parts as $part) {
             if (!empty($part)) {
-                // Extract content-disposition header to identify form field name and value.
+
                 if (preg_match('/Content-Disposition:.*?name="(.*?)".*?(?:\r\n\r\n|\n\n)(.*)/s', $part, $matches)) {
                     $name = $matches[1];
                     $value = $matches[2];
@@ -101,7 +87,6 @@ final class IncomingRequestHandler
             }
         }
 
-        // Merge the parsed form data with the existing body.
         $this->body = array_merge($this->body, $formData);
     }
 

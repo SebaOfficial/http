@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+namespace Seba\HTTP;
 
 /**
  * Authenticator Class.
@@ -7,12 +10,6 @@
  * @package Seba\HTTP
  * @author Sebastiano Racca
 */
-
-declare(strict_types=1);
-
-namespace Seba\HTTP;
-
-
 final class Authenticator
 {
     private ResponseHandler $response;
