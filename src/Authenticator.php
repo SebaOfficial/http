@@ -10,7 +10,7 @@ namespace Seba\HTTP;
  * @package Seba\HTTP
  * @author Sebastiano Racca
 */
-final class Authenticator
+class Authenticator
 {
     private ResponseHandler $response;
     private string $realm;

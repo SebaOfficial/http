@@ -13,7 +13,7 @@ use Seba\HTTP\Exceptions\InvalidBodyException;
  * @package Seba\HTTP
  * @author Sebastiano Racca
 */
-final class IncomingRequestHandler
+class IncomingRequestHandler
 {
     private ?array $body;
     private ?string $method;
@@ -42,7 +42,7 @@ final class IncomingRequestHandler
 
         if (str_starts_with($contentType, "application/x-www-form-urlencoded")) {
             $this->body = ($_SERVER["REQUEST_METHOD"] === "POST") ? $_POST : $_GET;
-            
+
         } elseif (str_starts_with($contentType, "multipart/form-data")) {
             $this->body = $_POST;
 

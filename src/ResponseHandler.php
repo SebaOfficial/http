@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+namespace Seba\HTTP;
 
 /**
  * Response Class.
@@ -7,13 +10,7 @@
  * @package Seba\HTTP
  * @author Sebastiano Racca
 */
-
-declare(strict_types=1);
-
-namespace Seba\HTTP;
-
-
-final class ResponseHandler
+class ResponseHandler
 {
     private int $httpCode;
     private array|object|string|null $body;
