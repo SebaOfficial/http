@@ -9,19 +9,23 @@ namespace Seba\HTTP;
  *
  * @package Seba\HTTP
  * @author Sebastiano Racca
-*/
+ */
 class Authenticator
 {
     private ResponseHandler $response;
     private string $realm;
 
+    public const AUTH_BASIC = 'Basic';
+    public const AUTH_BEARER = 'Bearer';
+
     /**
      * Authenticator constructor.
      *
-     * @param ResponseHandler $responseHandler   The response handler instance.
-     * @param string $realm                      The authentication realm.
+     * @param ResponseHandler $responseHandler The response handler instance.
+     * @param string $realm The authentication realm.
      */
-    public function __construct(ResponseHandler $responseHandler, string $realm) {
+    public function __construct(ResponseHandler $responseHandler, string $realm)
+    {
         $this->response = $responseHandler;
         $this->realm = $realm;
     }
@@ -29,10 +33,10 @@ class Authenticator
     /**
      * Checks if the provided username and password are correct.
      *
-     * @param string $username  The username.
-     * @param string $password  The password.
+     * @param string $username The username.
+     * @param string $password The password.
      *
-     * @return bool             True if the provided username and password are authenticated, false otherwise.
+     * @return bool True if the provided username and password are authenticated, false otherwise.
      */
     public function isAuthenticated(string $username, string $password): bool
     {
@@ -40,13 +44,34 @@ class Authenticator
     }
 
     /**
-     * Initiates the HTTP basic authentication process by sending a 401 Unauthorized response with the WWW-Authenticate header.
+     * Initiates the authentication process by sending a 401 Unauthorized response with the WWW-Authenticate header.
+     *
+     * @param string $authType The authentication type (e.g., "Basic", "Bearer", etc.).
+     * @param string $realm The authentication realm.
+     * @param string|null $error The error code (optional).
+     * @param string|null $errorDescription The error description (optional).
      */
-    public function init(): void
+    public function init(string $authType, string $realm, ?string $error = null, ?string $errorDescription = null): void
     {
-        $this->response->setHeaders([
-            "WWW-Authenticate: Basic realm=\"$this->realm\""
-        ])->setHttpCode(401)->send();
+        switch ($authType) {
+            case self::AUTH_BASIC:
+                $header = $this->composeHeader('Basic', $realm, $error, $errorDescription);
+                break;
+            case self::AUTH_BEARER:
+                $header = $this->composeHeader('Bearer', $realm, $error, $errorDescription);
+                break;
+            default:
+                throw new \InvalidArgumentException("Unsupported authentication type: $authType");
+        }
+        
+        $this->response->setHeaders([$header])->setHttpCode(401)->send();
+    }
+
+    private function composeHeader(string $type, string $realm, ?string $error = null, ?string $errorDescription = null) {
+        $header = "WWW-Authenticate: $type realm=\"$realm\"";
+        $header .= $error !== null ? "error=\"$error\"" : "";
+        $header .= $errorDescription !== null ? "error_description=\"$errorDescription\"" : "";
+        return $header;
     }
 
     /**
