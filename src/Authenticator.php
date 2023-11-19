@@ -33,10 +33,10 @@ class Authenticator
     /**
      * Checks if the provided credentials (username and password or token) are correct.
      *
-     * @param string $credential1 The username or token, depending on the authentication type.
-     * @param string|null $credential2 The password (for Basic) or null (for Bearer).
+     * @param string $credential1        The username or token, depending on the authentication type.
+     * @param string|null $credential2   The password (for Basic) or null (for Bearer).
      *
-     * @return bool True if the provided credentials are authenticated, false otherwise.
+     * @return bool                      True if the provided credentials are authenticated, false otherwise.
      */
     public function isAuthenticated(string $credential1, ?string $credential2 = null): bool
     {
@@ -96,7 +96,7 @@ class Authenticator
      *
      * @return string|null Returns the extracted Bearer token or null if not available.
      */
-    private function getBearerToken(): ?string
+    public function getBearerToken(): ?string
     {
         $authorizationHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? null;
 
