@@ -9,14 +9,13 @@
     "homepage": "https://github.com/SebaOfficial/HTTP",
     "license": "MIT",
     "autoload": {
-        "psr-4": {
-            "Seba\\HTTP\\": "src/",
-            "Seba\\HTTP\\Exceptions\\": "src/Exceptions/"
-        }
+        "classmap": [
+            "src/"
+        ]
     },
     "authors": [
         {
-            "name": "Sebastiano",
+            "name": "Sebastiano Racca",
             "email": "sebastiano@racca.me",
             "role": "Developer",
             "homepage": "https://github.com/SebaOfficial"
@@ -27,6 +26,9 @@
         "pestphp/pest-plugin-faker": "^1.0"
     },
     "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true
         }
