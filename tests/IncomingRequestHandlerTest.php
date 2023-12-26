@@ -9,7 +9,7 @@ class IncomingRequestHandlerTest extends PHPUnit\Framework\TestCase
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_GET = ["param1" => "value1", "param2" => "value2"];
-        $requestHandler = new IncomingRequestHandler();
+        $requestHandler = new IncomingRequestHandler("application/x-www-form-urlencoded");
 
         $this->assertEquals('GET', $requestHandler->getMethod());
         $this->assertEquals($requestHandler->getBody(), $_GET);
@@ -18,7 +18,7 @@ class IncomingRequestHandlerTest extends PHPUnit\Framework\TestCase
     public function testPostMethod()
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $requestHandler = new IncomingRequestHandler();
+        $requestHandler = new IncomingRequestHandler("application/x-www-form-urlencoded");
         $_POST = ["param1" => "value1", "param2" => "value2"];
 
         $method = $requestHandler->getMethod();
