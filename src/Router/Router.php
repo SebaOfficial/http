@@ -24,6 +24,9 @@ class Router
 
     public function __construct(IncomingRequestHandler $request, ResponseHandler $response)
     {
+        $this->routes = [];
+        $this->errorHandlers = [];
+
         $this->request = $request;
         $this->response = $response;
     }
@@ -148,15 +151,21 @@ class Router
      * @param string $pattern A route pattern (i.e. /about). You can pass a regex.
      * @param callable $fn The callback method.
      */
-    public function mount(string $basePath, callable|object $fn): void
+    public function mount(string $basePath, callable $fn): void
     {
         $router = new Router($this->request, $this->response);
 
         $fn($router);
 
-        foreach ($router->getRoutes() as $pattern => $handlers) {
-            foreach ($handlers as $method => $handler) {
-                $this->routes[$basePath . $pattern][$method] = $handler;
+        $this->registerHandlers($basePath, $router->getRoutes(), $this->routes);
+        $this->registerHandlers($basePath, $router->getErrorHandlers(), $this->errorHandlers);
+    }
+
+    private function registerHandlers(string $basePath, array $handlers, array &$target): void
+    {
+        foreach ($handlers as $pattern => $methods) {
+            foreach ($methods as $method => $handler) {
+                $target[$basePath . $pattern][$method] = $handler;
             }
         }
     }
@@ -210,6 +219,16 @@ class Router
     public function getRoutes(): array
     {
         return $this->routes;
+    }
+
+    /**
+     * Get all defined error handlers.
+     *
+     * @return array An array of defined error handlers.
+     */
+    public function getErrorHandlers(): array
+    {
+        return $this->errorHandlers;
     }
 
     /**
