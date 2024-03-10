@@ -174,15 +174,17 @@ class Router
      * Triggers an error handling function.
      *
      * @param int $httpStatusCode The error code.
-     * @param string $pattern A route pattern (i.e. /about). You can pass a regex.
+     * @param string|null $pattern A route pattern (i.e. /about). You can pass a regex.
      */
-    public function triggerError(int $httpStatusCode, string $pattern = "/"): void
+    public function triggerError(int $httpStatusCode, ?string $pattern = null): void
     {
-        if(!isset($this->errorHandlers[$httpStatusCode][$pattern])) {
-            $this->response->setHttpCode($httpStatusCode)->send();
+        $pattern ??= $this->request->getUri();
+
+        if (isset($this->errorHandlers[$httpStatusCode][$pattern]) && preg_match("#^$pattern$#", $pattern, $matches)) {
+            $this->errorHandlers[$httpStatusCode][$pattern](...$matches);
         }
 
-        $this->errorHandlers[$httpStatusCode][$pattern]($this->request, $this->response);
+        $this->response->setHttpCode($httpStatusCode)->send();
     }
 
     /**
@@ -198,19 +200,19 @@ class Router
         $method = $this->request->getMethod();
 
         foreach ($this->routes as $pattern => $handlers) {
-            if (preg_match("#^$pattern$#", $currentRoute)) {
+            if (preg_match("#^$pattern$#", $currentRoute, $matches)) {
                 $requestedMethods = array_keys($handlers);
                 if (in_array($method, $requestedMethods)) {
                     $handler = $handlers[$method];
                     if (is_callable($handler)) {
-                        $handler($this->response, $this->request);
+                        $handler(...$matches);
                         return true;
                     }
                 }
             }
         }
 
-        $this->triggerError(404, $currentRoute);
+        $this->triggerError(404);
 
         return false;
     }
