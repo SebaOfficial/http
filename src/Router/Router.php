@@ -150,13 +150,10 @@ class Router
      */
     public function mount(string $basePath, callable|object $fn): void
     {
-        // Create a new instance of the router with modified base path
         $router = new Router($this->request, $this->response);
 
-        // Modify the routes inside the callback to prepend the base path
         $fn($router);
 
-        // Prepend the base path to all routes defined in the mounted router
         foreach ($router->getRoutes() as $pattern => $handlers) {
             foreach ($handlers as $method => $handler) {
                 $this->routes[$basePath . $pattern][$method] = $handler;
@@ -171,20 +168,32 @@ class Router
      * @param object|callable $fn The function to be executed.
      * @param string $pattern A route pattern (i.e. /about). You can pass a regex.
      */
-    public function onError(int $httpStatusCode, callable|object $fn, string $pattern = "/"): void
+    public function onError(int $httpStatusCode, callable|object $fn, string $pattern = '/?.*'): void
     {
-        $this->errorHandlers[$httpStatusCode][$pattern] = $fn;
+        $this->errorHandlers[$pattern][$httpStatusCode] = $fn;
     }
 
     /**
      * Triggers an error handling function.
      *
      * @param int $httpStatusCode The error code.
-     * @param string|null $pattern A route pattern (i.e. /about). You can pass a regex.
      */
-    public function triggerError(int $httpStatusCode, ?string $pattern = null): void
+    public function triggerError(int $httpStatusCode): void
     {
-        $pattern ??= $this->request->getUri();
+        $currentRoute = $this->request->getUri();
+
+        foreach ($this->errorHandlers as $pattern => $httpCodes) {
+            if (preg_match("#^$pattern$#", $currentRoute, $matches)) {
+                $requestedMethods = array_keys($httpCodes);
+                if (in_array($httpStatusCode, $requestedMethods)) {
+                    $handler = $httpCodes[$httpStatusCode];
+                    if (is_callable($handler)) {
+                        unset($matches[0]);
+                        $handler(...$matches);
+                    }
+                }
+            }
+        }
 
         if (isset($this->errorHandlers[$httpStatusCode][$pattern]) && preg_match("#^$pattern$#", $pattern, $matches)) {
             $this->errorHandlers[$httpStatusCode][$pattern](...$matches);
