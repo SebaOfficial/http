@@ -2,4 +2,6 @@
 
 namespace Seba\HTTP\Exceptions;
 
-class InvalidBodyException extends \Exception {}
+class InvalidBodyException extends \Exception
+{
+}

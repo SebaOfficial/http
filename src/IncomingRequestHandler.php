@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Seba\HTTP;
@@ -98,7 +99,7 @@ class IncomingRequestHandler
     public function getBody(): array
     {
 
-        if(!isset($this->body)){
+        if(!isset($this->body)) {
             $this->parseBody();
         }
 
@@ -246,18 +247,19 @@ class IncomingRequestHandler
     public function allowOrigin(?array $origins): bool
     {
 
-        if(empty($origins)){
+        if(empty($origins)) {
             header("Access-Control-Allow-Origin: null");
             return false;
         }
 
-        if(in_array("*", $origins)){
+        if(in_array("*", $origins)) {
             header("Access-Control-Allow-Origin: *");
             return true;
         }
 
-        if(!in_array($_SERVER['HTTP_ORIGIN'] ?? null, $origins))
+        if(!in_array($_SERVER['HTTP_ORIGIN'] ?? null, $origins)) {
             return false;
+        }
 
         header("Access-Control-Allow-Origin: " . ($_SERVER['HTTP_ORIGIN'] ?? "*"));
         return true;

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Seba\HTTP;
@@ -58,7 +59,7 @@ class Authenticator
      * @param string|null $error              The error code (optional).
      * @param string|null $errorDescription   The error description (optional).
      */
-    public function init( string $realm, ?string $error = null, ?string $errorDescription = null): void
+    public function init(string $realm, ?string $error = null, ?string $errorDescription = null): void
     {
         switch ($this->authType) {
             case self::AUTH_BASIC:
@@ -84,7 +85,8 @@ class Authenticator
      *
      * @return string                         The composed WWW-Authenticate header.
      */
-    private function composeHeader(string $type, string $realm, ?string $error = null, ?string $errorDescription = null) {
+    private function composeHeader(string $type, string $realm, ?string $error = null, ?string $errorDescription = null)
+    {
         $header = "WWW-Authenticate: $type realm=\"$realm\"";
         $header .= $error !== null ? "error=\"$error\"" : "";
         $header .= $errorDescription !== null ? "error_description=\"$errorDescription\"" : "";

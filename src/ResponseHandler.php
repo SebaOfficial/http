@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Seba\HTTP;
@@ -60,8 +61,9 @@ class ResponseHandler
      */
     public function setHeaders(array $headers): self
     {
-        foreach($headers as $header)
+        foreach($headers as $header) {
             header($header, true);
+        }
         return $this;
     }
 
@@ -75,9 +77,12 @@ class ResponseHandler
     {
         http_response_code($this->httpCode);
 
-        if(isset($this->body))
+        if(isset($this->body)) {
             echo is_string($this->body) ? $this->body : json_encode($this->body);
+        }
 
-        if($exit) exit;
+        if($exit) {
+            exit;
+        }
     }
 }

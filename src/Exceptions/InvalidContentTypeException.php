@@ -2,4 +2,6 @@
 
 namespace Seba\HTTP\Exceptions;
 
-class InvalidContentTypeException extends \Exception {}
+class InvalidContentTypeException extends \Exception
+{
+}
