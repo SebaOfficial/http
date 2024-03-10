@@ -30,7 +30,8 @@ class RequestedMethods
         'HEAD' => self::HEAD,
     ];
 
-    public static function getStrings(int $methods): array {
+    public static function getStrings(int $methods): array
+    {
         $strings = [];
         foreach (self::$methodStrings as $method => $value) {
             if ($methods & $value) {
@@ -40,4 +41,3 @@ class RequestedMethods
         return $strings;
     }
 }
-

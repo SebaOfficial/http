@@ -35,7 +35,8 @@ class Router
      * @param string $pattern A route pattern (i.e. /about). You can pass a regex.
      * @param object|callable $fn The handling function to be executed.
      */
-    public function match(int $methods, string $pattern, callable|object $fn): void {
+    public function match(int $methods, string $pattern, callable|object $fn): void
+    {
         $methodStrings = RequestedMethods::getStrings($methods);
 
         foreach ($methodStrings as $methodString) {
@@ -147,14 +148,19 @@ class Router
      * @param string $pattern A route pattern (i.e. /about). You can pass a regex.
      * @param callable $fn The callback method.
      */
-    public function mount(string $pattern, callable|object $fn): void
+    public function mount(string $basePath, callable|object $fn): void
     {
-        $fn($this);
+        // Create a new instance of the router with modified base path
+        $router = new Router($this->request, $this->response);
 
-        foreach ($this->routes as $routePattern => $handlers) {
-            $mountedPattern = rtrim($pattern, '/') . $routePattern;
-            $this->routes[$mountedPattern] = $handlers;
-            unset($this->routes[$routePattern]);
+        // Modify the routes inside the callback to prepend the base path
+        $fn($router);
+
+        // Prepend the base path to all routes defined in the mounted router
+        foreach ($router->getRoutes() as $pattern => $handlers) {
+            foreach ($handlers as $method => $handler) {
+                $this->routes[$basePath . $pattern][$method] = $handler;
+            }
         }
     }
 
@@ -188,6 +194,16 @@ class Router
     }
 
     /**
+     * Get all defined routes.
+     *
+     * @return array An array of defined routes.
+     */
+    public function getRoutes(): array
+    {
+        return $this->routes;
+    }
+
+    /**
      * Execute the router: Loop all defined before middleware's and routes, and execute the handling function if a match was found.
      *
      * @param object|callable $callback Function to be executed after a matching route was handled (= after router middleware)
@@ -205,6 +221,7 @@ class Router
                 if (in_array($method, $requestedMethods)) {
                     $handler = $handlers[$method];
                     if (is_callable($handler)) {
+                        unset($matches[0]);
                         $handler(...$matches);
                         return true;
                     }
