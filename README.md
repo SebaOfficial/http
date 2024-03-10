@@ -1,7 +1,7 @@
 <div style="text-align: center;">
     <h1>HTTP Handler Library</h1>
-    <img title="Latest Version on Packagist" alt="Latest Version on Packagist" src="https://img.shields.io/packagist/v/sebaofficial/http.svg?label=composer&logo=composer">
-    <img title="PHP Version" alt="PHP Version" src="https://img.shields.io/packagist/dependency-v/sebaofficial/http/php?logo=php">
+    <img title="Latest Version on Packagist" alt="Latest Version on Packagist" src="https://img.shields.io/packagist/v/seba/http.svg?label=composer&logo=composer">
+    <img title="PHP Version" alt="PHP Version" src="https://img.shields.io/packagist/dependency-v/sebao/http/php?logo=php">
 </div>
 <br>
 
