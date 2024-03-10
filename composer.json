@@ -21,6 +21,9 @@
             "homepage": "https://github.com/SebaOfficial"
         }
     ],
+    "require": {
+        "php": ">= 8"
+    },
     "require-dev": {
         "pestphp/pest": "^1.0",
         "pestphp/pest-plugin-faker": "^1.0",
