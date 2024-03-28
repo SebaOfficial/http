@@ -14,6 +14,7 @@ namespace Seba\HTTP;
 class ResponseHandler
 {
     private int $httpCode;
+    private array $headers;
     private array|object|string|null $body;
 
     /**
@@ -24,6 +25,7 @@ class ResponseHandler
     {
         $this->body = null;
         $this->httpCode = $defaultHTTPCode;
+        $this->headers = [];
     }
 
     /**
@@ -44,11 +46,25 @@ class ResponseHandler
      *
      * @param array|object|string $body   The body to be set.
      *
-     * @return self       Returns the current instance.
+     * @return self                       Returns the current instance.
      */
     public function setBody(array|object|string $body): self
     {
         $this->body = $body;
+        return $this;
+    }
+
+    /**
+     * Sets a response header.
+     *
+     * @param string $key     The header name.
+     * @param string $value   The hader value.
+     *
+     * @return self           Returns the current instance.
+     */
+    public function setHeader(string $key, string $value): self
+    {
+        $this->headers[$key] = $value;
         return $this;
     }
 
@@ -61,8 +77,8 @@ class ResponseHandler
      */
     public function setHeaders(array $headers): self
     {
-        foreach($headers as $header) {
-            header($header, true);
+        foreach($headers as $key => $value) {
+            $this->setHeader($key, $value);
         }
         return $this;
     }
@@ -76,6 +92,10 @@ class ResponseHandler
     public function send(bool $exit = true): void
     {
         http_response_code($this->httpCode);
+
+        foreach($this->headers as $key => $value) {
+            header("$key: $value", true);
+        }
 
         if(isset($this->body)) {
             echo is_string($this->body) ? $this->body : json_encode($this->body);
