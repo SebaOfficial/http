@@ -20,6 +20,8 @@ class ResponseHandler
     /**
      * Response constructor.
      * Initialises the response with default values.
+     *
+     * @param int $defaultHTTPCode The default HTTP Status code to send if none provided.
      */
     public function __construct(int $defaultHTTPCode = 204)
     {
@@ -31,11 +33,11 @@ class ResponseHandler
     /**
      * Sets the HTTP Code.
      *
-     * @param int $code The code to be set.
+     * @param int $code   The code to be set.
      *
-     * @return self Returns the current instance.
+     * @return static     Returns the current instance.
      */
-    public function setHttpCode(int $code): self
+    public function setHttpCode(int $code): static
     {
         $this->httpCode = $code;
         return $this;
@@ -46,9 +48,9 @@ class ResponseHandler
      *
      * @param array|object|string $body   The body to be set.
      *
-     * @return self                       Returns the current instance.
+     * @return static                     Returns the current instance.
      */
-    public function setBody(array|object|string $body): self
+    public function setBody(array|object|string $body): static
     {
         $this->body = $body;
         return $this;
@@ -60,9 +62,9 @@ class ResponseHandler
      * @param string $key     The header name.
      * @param string $value   The hader value.
      *
-     * @return self           Returns the current instance.
+     * @return static         Returns the current instance.
      */
-    public function setHeader(string $key, string $value): self
+    public function setHeader(string $key, string $value): static
     {
         $this->headers[$key] = $value;
         return $this;
@@ -71,11 +73,11 @@ class ResponseHandler
     /**
      * Sets response headers.
      *
-     * @param array   A list of headers to be set.
+     * @param array     A list of headers to be set.
      *
-     * @return self   Returns the current instance.
+     * @return static   Returns the current instance.
      */
-    public function setHeaders(array $headers): self
+    public function setHeaders(array $headers): static
     {
         foreach($headers as $key => $value) {
             $this->setHeader($key, $value);
